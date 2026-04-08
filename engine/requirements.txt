@@ -7,7 +7,7 @@ moviepy==2.1.2
 pydub==0.25.1
 Pillow==10.4.0
 yt-dlp==2025.3.31
-youtube-transcript-api==0.6.3
+youtube-transcript-api==1.2.4
 replicate==1.0.4
 python-dotenv==1.0.1
 aiofiles==24.1.0

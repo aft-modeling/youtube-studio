@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import uvicorn
 
 from script_generator import generate_script
+from reference_analyzer import analyze_reference
 
 app = FastAPI(title="YouTube Studio Engine")
 
@@ -44,6 +45,20 @@ async def api_generate_script(req: ScriptRequest):
 
     if "error" in result:
         return {"error": result["error"]}, 500
+
+    return result
+
+
+class ReferenceRequest(BaseModel):
+    youtube_url: str
+
+
+@app.post("/api/analyze-reference")
+async def api_analyze_reference(req: ReferenceRequest):
+    result = await analyze_reference(youtube_url=req.youtube_url)
+
+    if "error" in result:
+        return {"error": result["error"]}, 400
 
     return result
 
