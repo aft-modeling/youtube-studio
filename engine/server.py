@@ -9,6 +9,7 @@ from voiceover import generate_voiceover
 from visuals import generate_visuals
 from captions import generate_captions
 from assembler import assemble_video
+from thumbnail import generate_thumbnails
 
 app = FastAPI(title="YouTube Studio Engine")
 
@@ -155,6 +156,26 @@ async def api_assemble_video(req: AssembleRequest):
         music_volume=req.music_volume,
         intro_text=req.intro_text,
         outro_text=req.outro_text,
+    )
+
+    if "error" in result:
+        return {"error": result["error"]}, 500
+
+    return result
+
+
+class ThumbnailRequest(BaseModel):
+    title: str
+    topic: str
+    hook_text: str = ""
+
+
+@app.post("/api/generate-thumbnails")
+async def api_generate_thumbnails(req: ThumbnailRequest):
+    result = await generate_thumbnails(
+        title=req.title,
+        topic=req.topic,
+        hook_text=req.hook_text,
     )
 
     if "error" in result:
