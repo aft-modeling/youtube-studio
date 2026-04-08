@@ -8,6 +8,7 @@ from reference_analyzer import analyze_reference
 from voiceover import generate_voiceover
 from visuals import generate_visuals
 from captions import generate_captions
+from assembler import assemble_video
 
 app = FastAPI(title="YouTube Studio Engine")
 
@@ -132,9 +133,34 @@ async def api_generate_captions(req: CaptionsRequest):
     return result
 
 
-@app.post("/api/generate-video")
-async def generate_video():
-    return {"message": "not implemented yet"}
+class AssembleRequest(BaseModel):
+    project_id: str = ""
+    voiceover_path: str
+    visual_timeline: list[dict]
+    caption_path: str | None = None
+    music_path: str | None = None
+    music_volume: float = 0.15
+    intro_text: str | None = None
+    outro_text: str | None = None
+
+
+@app.post("/api/assemble-video")
+async def api_assemble_video(req: AssembleRequest):
+    result = await assemble_video(
+        project_id=req.project_id,
+        voiceover_path=req.voiceover_path,
+        visual_timeline=req.visual_timeline,
+        caption_path=req.caption_path,
+        music_path=req.music_path,
+        music_volume=req.music_volume,
+        intro_text=req.intro_text,
+        outro_text=req.outro_text,
+    )
+
+    if "error" in result:
+        return {"error": result["error"]}, 500
+
+    return result
 
 
 if __name__ == "__main__":
