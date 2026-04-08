@@ -7,6 +7,7 @@ from script_generator import generate_script
 from reference_analyzer import analyze_reference
 from voiceover import generate_voiceover
 from visuals import generate_visuals
+from captions import generate_captions
 
 app = FastAPI(title="YouTube Studio Engine")
 
@@ -97,6 +98,32 @@ async def api_generate_visuals(req: VisualsRequest):
     result = await generate_visuals(
         script_segments=req.script_segments,
         project_id=req.project_id,
+    )
+
+    if "error" in result:
+        return {"error": result["error"]}, 500
+
+    return result
+
+
+class CaptionsRequest(BaseModel):
+    word_timestamps: list[dict]
+    font_name: str = "Montserrat"
+    font_size: int = 48
+    primary_color: str = "#FFFFFF"
+    highlight_color: str = "#FFD700"
+    position: str = "bottom"
+
+
+@app.post("/api/generate-captions")
+async def api_generate_captions(req: CaptionsRequest):
+    result = await generate_captions(
+        word_timestamps=req.word_timestamps,
+        font_name=req.font_name,
+        font_size=req.font_size,
+        primary_color=req.primary_color,
+        highlight_color=req.highlight_color,
+        position=req.position,
     )
 
     if "error" in result:
