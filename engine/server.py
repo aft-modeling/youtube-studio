@@ -5,6 +5,7 @@ import uvicorn
 
 from script_generator import generate_script
 from reference_analyzer import analyze_reference
+from voiceover import generate_voiceover
 
 app = FastAPI(title="YouTube Studio Engine")
 
@@ -59,6 +60,28 @@ async def api_analyze_reference(req: ReferenceRequest):
 
     if "error" in result:
         return {"error": result["error"]}, 400
+
+    return result
+
+
+class VoiceoverRequest(BaseModel):
+    script_text: str
+    voice_id: str
+    stability: float = 0.5
+    similarity: float = 0.75
+
+
+@app.post("/api/generate-voiceover")
+async def api_generate_voiceover(req: VoiceoverRequest):
+    result = await generate_voiceover(
+        script_text=req.script_text,
+        voice_id=req.voice_id,
+        stability=req.stability,
+        similarity=req.similarity,
+    )
+
+    if "error" in result:
+        return {"error": result["error"]}, 500
 
     return result
 
